@@ -13,134 +13,80 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
 
     constructor(host) {
         super(host);
-        console.log('[uMockingSuite] UMockingSuiteWorkspaceContext constructor called', host);
+        console.log('[uMockingSuite] constructor called');
 
         this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
-            console.log('[uMockingSuite] ✅ Got notification context', context);
             this.#notificationContext = context;
         });
 
         this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
-            console.log('[uMockingSuite] ✅ Got auth context', context);
             this.#authContext = context;
         });
 
         this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-            console.log('[uMockingSuite] ✅ Got document workspace context', context);
+            console.log('[uMockingSuite] ✅ Got document workspace context');
             this.#documentContext = context;
 
-            // 1. Log ALL prototype chain properties (JSON.stringify avoids browser truncation)
-            const protoProps = new Set();
-            let p = Object.getPrototypeOf(context);
-            while (p && p !== Object.prototype) {
-                Object.getOwnPropertyNames(p).forEach(n => protoProps.add(n));
-                p = Object.getPrototypeOf(p);
-            }
-            console.log('[uMockingSuite] PROTO PROPS:', JSON.stringify([...protoProps].sort()));
-
-            // 2. Dynamically wrap every proto method whose name contains save/submit/handle/request/publish
-            const targetPattern = /save|submit|handle|request|publish/i;
-            for (const name of protoProps) {
-                if (!targetPattern.test(name)) continue;
-                if (typeof context[name] !== 'function') continue;
-                const orig = context[name].bind(context);
-                context[name] = async (...args) => {
-                    console.log(`[uMockingSuite] 🔍 ${name} called`, args);
-                    try {
-                        const result = await orig(...args);
-                        console.log(`[uMockingSuite] ✅ ${name} completed`);
-                        return result;
-                    } catch (e) {
-                        console.warn(`[uMockingSuite] ⚠️ ${name} threw:`, e);
-                        throw e;
-                    }
-                };
-            }
-
-            // 3. Belt-and-braces: also wrap specific names in case they're on the instance only
-            const specificNames = ['requestSubmit', 'submit', '_handleSave', '_handleSubmit', 'save', 'publish'];
-            for (const methodName of specificNames) {
-                if (typeof context[methodName] === 'function') {
-                    const orig = context[methodName].bind(context);
-                    context[methodName] = async (...args) => {
-                        console.log(`[uMockingSuite] 🔍 ${methodName} called`, args);
-                        try {
-                            const result = await orig(...args);
-                            console.log(`[uMockingSuite] ✅ ${methodName} completed`);
-                            return result;
-                        } catch (e) {
-                            console.warn(`[uMockingSuite] ⚠️ ${methodName} threw:`, e);
-                            throw e;
-                        }
+            // Hook validateVariantsAndSubmit — confirmed as the save entry point in Umbraco 17.
+            // We intercept the resolveFn callback (2nd argument) to detect a successful save.
+            // IMPORTANT: wrapper must be synchronous (not async) — these are callback-based, not Promise-based.
+            if (typeof context.validateVariantsAndSubmit === 'function') {
+                const orig = context.validateVariantsAndSubmit.bind(context);
+                context.validateVariantsAndSubmit = (variants, resolveFn, rejectFn) => {
+                    const wrappedResolve = (...args) => {
+                        console.log('[uMockingSuite] 🎭 Save succeeded — fetching mocking message...');
+                        this.#handleSaveCompleted(); // async fire-and-forget — do NOT await
+                        return resolveFn?.(...args);
                     };
-                }
+                    return orig(variants, wrappedResolve, rejectFn);
+                };
+                console.log('[uMockingSuite] ✅ validateVariantsAndSubmit hooked');
+            } else {
+                console.warn('[uMockingSuite] ⚠️ validateVariantsAndSubmit not found on context');
             }
-
-            // 6. Click listener diagnostic — correlate button clicks with saves
-            this._host?.addEventListener?.('click', (e) => {
-                if (e.target?.tagName === 'BUTTON' || e.target?.closest?.('button')) {
-                    console.log('[uMockingSuite] 🖱️ Button click:', e.target?.textContent?.trim(), e.target);
-                }
-            }, true);
         });
     }
 
     async #handleSaveCompleted() {
-        if (this.#isFetchingMockMessage) {
-            console.log('[uMockingSuite] #handleSaveCompleted — already in progress, skipping');
-            return;
-        }
+        if (this.#isFetchingMockMessage) return;
         this.#isFetchingMockMessage = true;
-        console.log('[uMockingSuite] #handleSaveCompleted called');
+
         try {
-            const name = this.#documentContext?.getName?.() || 'this content';
-            const contentTypeRaw = this.#documentContext?.getContentType?.();
-            console.log('[uMockingSuite] name:', name, '| contentTypeRaw:', contentTypeRaw);
-
+            const name = this.#documentContext?.getName?.() ?? 'this content';
+            const contentTypeRaw = this.#documentContext?.getContentTypeId?.() ?? this.#documentContext?.getContentType?.();
             const contentTypeAlias =
-                (contentTypeRaw && typeof contentTypeRaw === 'object' ? contentTypeRaw.alias : contentTypeRaw) ||
-                'unknown';
+                (contentTypeRaw && typeof contentTypeRaw === 'object' ? contentTypeRaw.alias : contentTypeRaw) ?? 'unknown';
 
-            console.log('[uMockingSuite] contentTypeAlias:', contentTypeAlias);
-            console.log('[uMockingSuite] authContext:', this.#authContext);
+            console.log('[uMockingSuite] fetching mocking message — name:', name, 'type:', contentTypeAlias);
 
             const token = await this.#authContext?.getLatestToken?.();
-            console.log('[uMockingSuite] token present:', !!token);
-
             if (!token) {
-                console.warn('[uMockingSuite] ⚠️ No auth token available — skipping mocking message fetch.');
+                console.warn('[uMockingSuite] ⚠️ No auth token — skipping.');
                 return;
             }
 
             const params = new URLSearchParams({ contentName: name, contentTypeAlias });
             const url = `/umbraco/management/api/v1/umockingsuite/mocking-message?${params}`;
-            console.log('[uMockingSuite] Fetching:', url);
-
             const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-            console.log('[uMockingSuite] API response status:', response.status);
 
             if (!response.ok) {
-                const body = await response.text().catch(() => '(unreadable)');
-                console.warn('[uMockingSuite] ⚠️ API returned', response.status, '— body:', body);
+                console.warn('[uMockingSuite] ⚠️ API returned', response.status);
                 return;
             }
 
             const data = await response.json();
-            console.log('[uMockingSuite] API data:', data);
+            console.log('[uMockingSuite] 🎭 message received:', data?.message);
 
             if (data?.message) {
-                console.log('[uMockingSuite] 🎭 Showing toast:', data.message);
                 this.#notificationContext?.peek('warning', {
                     data: {
                         headline: '🎭 uMockingSuite says:',
                         message: data.message
                     }
                 });
-            } else {
-                console.warn('[uMockingSuite] ⚠️ No message in API response — no toast shown.');
             }
         } catch (error) {
-            console.error('[uMockingSuite] ❌ Failed to fetch mocking message:', error);
+            console.error('[uMockingSuite] ❌ Error:', error);
         } finally {
             this.#isFetchingMockMessage = false;
         }
