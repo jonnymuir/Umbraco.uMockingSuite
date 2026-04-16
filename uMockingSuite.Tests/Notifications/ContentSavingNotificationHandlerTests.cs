@@ -13,12 +13,12 @@ namespace uMockingSuite.Tests.Notifications;
 public class ContentSavingNotificationHandlerTests
 {
     private readonly Mock<IMockingService> _mockingServiceMock = new();
-    private readonly Mock<ILogger<ContentSavingNotificationHandler>> _loggerMock = new();
-    private readonly ContentSavingNotificationHandler _sut;
+    private readonly Mock<ILogger<ContentSavedNotificationHandler>> _loggerMock = new();
+    private readonly ContentSavedNotificationHandler _sut;
 
     public ContentSavingNotificationHandlerTests()
     {
-        _sut = new ContentSavingNotificationHandler(
+        _sut = new ContentSavedNotificationHandler(
             _mockingServiceMock.Object,
             _loggerMock.Object);
     }
@@ -134,8 +134,8 @@ public class ContentSavingNotificationHandlerTests
         return contentMock.Object;
     }
 
-    private static ContentSavingNotification CreateNotification(params IContent[] contents)
+    private static ContentSavedNotification CreateNotification(params IContent[] contents)
     {
-        return new ContentSavingNotification(contents.ToList(), new Umbraco.Cms.Core.Events.EventMessages());
+        return new ContentSavedNotification(contents.ToList(), new Umbraco.Cms.Core.Events.EventMessages());
     }
 }

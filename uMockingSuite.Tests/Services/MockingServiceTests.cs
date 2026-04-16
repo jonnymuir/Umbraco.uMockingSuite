@@ -1,6 +1,7 @@
 using Moq;
 using Xunit;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using uMockingSuite.Services;
 
@@ -8,7 +9,13 @@ namespace uMockingSuite.Tests.Services;
 
 public class MockingServiceTests
 {
-    private readonly MockingService _sut = new();
+    private readonly Mock<ILogger<MockingService>> _loggerMock = new();
+    private readonly MockingService _sut;
+
+    public MockingServiceTests()
+    {
+        _sut = new MockingService(_loggerMock.Object);
+    }
 
     [Fact]
     public void GetMockingMessage_WithNamedContent_ReturnsNonEmptyMessage()

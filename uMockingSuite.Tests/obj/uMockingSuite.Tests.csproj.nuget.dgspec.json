@@ -55,7 +55,7 @@
             },
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[10.0.2, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
@@ -65,9 +65,13 @@
               "target": "Package",
               "version": "[4.20.72, )"
             },
+            "Umbraco.AI.Core": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
             "Umbraco.Cms.Core": {
               "target": "Package",
-              "version": "[17.0.0, )"
+              "version": "[17.1.0, )"
             },
             "coverlet.collector": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -421,6 +425,11 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "Umbraco.AI.Core": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
             "Umbraco.Cms": {
               "suppressParent": "All",
               "target": "Package",

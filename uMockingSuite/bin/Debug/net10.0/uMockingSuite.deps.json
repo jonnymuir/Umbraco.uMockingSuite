@@ -8,10 +8,19 @@
     ".NETCoreApp,Version=v10.0": {
       "uMockingSuite/0.1.0": {
         "dependencies": {
+          "Umbraco.AI.Core": "1.9.0",
           "Umbraco.Cms": "17.3.4"
         },
         "runtime": {
           "uMockingSuite.dll": {}
+        }
+      },
+      "AngleSharp/1.4.0": {
+        "runtime": {
+          "lib/net10.0/AngleSharp.dll": {
+            "assemblyVersion": "1.4.0.0",
+            "fileVersion": "1.4.0.0"
+          }
         }
       },
       "Asp.Versioning.Abstractions/8.1.0": {
@@ -101,6 +110,28 @@
           "lib/netstandard1.3/Dazinator.Extensions.FileProviders.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml/3.3.0": {
+        "dependencies": {
+          "DocumentFormat.OpenXml.Framework": "3.3.0"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml.Framework/3.3.0": {
+        "dependencies": {
+          "System.IO.Packaging": "8.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
           }
         }
       },
@@ -581,6 +612,29 @@
           "lib/net10.0/Microsoft.EntityFrameworkCore.SqlServer.dll": {
             "assemblyVersion": "10.0.4.0",
             "fileVersion": "10.0.426.12010"
+          }
+        }
+      },
+      "Microsoft.Extensions.AI/10.2.0": {
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.2.0",
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.4",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.4",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.4",
+          "System.Numerics.Tensors": "10.0.2"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.AI.dll": {
+            "assemblyVersion": "10.2.0.0",
+            "fileVersion": "10.200.26.6302"
+          }
+        }
+      },
+      "Microsoft.Extensions.AI.Abstractions/10.2.0": {
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.AI.Abstractions.dll": {
+            "assemblyVersion": "10.2.0.0",
+            "fileVersion": "10.200.26.6302"
           }
         }
       },
@@ -1741,6 +1795,17 @@
           }
         }
       },
+      "SmartReader/0.11.0": {
+        "dependencies": {
+          "AngleSharp": "1.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/SmartReader.dll": {
+            "assemblyVersion": "0.11.0.0",
+            "fileVersion": "0.11.0.0"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.11",
@@ -1982,6 +2047,14 @@
           }
         }
       },
+      "System.IO.Packaging/8.0.1": {
+        "runtime": {
+          "lib/net8.0/System.IO.Packaging.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.1024.46610"
+          }
+        }
+      },
       "System.Linq.Async/7.0.0": {
         "dependencies": {
           "System.Interactive.Async": "7.0.0"
@@ -2001,11 +2074,39 @@
           }
         }
       },
+      "System.Numerics.Tensors/10.0.2": {
+        "runtime": {
+          "lib/net10.0/System.Numerics.Tensors.dll": {
+            "assemblyVersion": "10.0.0.2",
+            "fileVersion": "10.0.225.61305"
+          }
+        }
+      },
       "System.Security.Cryptography.ProtectedData/9.0.4": {
         "runtime": {
           "lib/net9.0/System.Security.Cryptography.ProtectedData.dll": {
             "assemblyVersion": "9.0.0.0",
             "fileVersion": "9.0.425.16305"
+          }
+        }
+      },
+      "Umbraco.AI.Core/1.9.0": {
+        "dependencies": {
+          "DocumentFormat.OpenXml": "3.3.0",
+          "Microsoft.Extensions.AI": "10.2.0",
+          "Microsoft.Extensions.Caching.Memory": "10.0.4",
+          "Microsoft.Extensions.Options": "10.0.4",
+          "SixLabors.ImageSharp": "3.1.12",
+          "SmartReader": "0.11.0",
+          "Umbraco.Cms.Api.Management": "17.3.4",
+          "Umbraco.Cms.Core": "17.3.4",
+          "Umbraco.Cms.Infrastructure": "17.3.4",
+          "Umbraco.Cms.Web.Common": "17.3.4"
+        },
+        "runtime": {
+          "lib/net10.0/Umbraco.AI.Core.dll": {
+            "assemblyVersion": "1.9.0.0",
+            "fileVersion": "1.9.0.3"
           }
         }
       },
@@ -2918,6 +3019,13 @@
       "serviceable": false,
       "sha512": ""
     },
+    "AngleSharp/1.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6ph8mpaQx0KL0COYRt0kI8MB9gSp1PtKijKMhJU//+aVFgKAJLKDesG/+26JSaVCOrHNgPf12wpfoyRcMYOeXg==",
+      "path": "anglesharp/1.4.0",
+      "hashPath": "anglesharp.1.4.0.nupkg.sha512"
+    },
     "Asp.Versioning.Abstractions/8.1.0": {
       "type": "package",
       "serviceable": true,
@@ -2973,6 +3081,20 @@
       "sha512": "sha512-Jb10uIvdGdaaOmEGUXeO1ssjp6YuvOuR87B5gLxGORFbroV1j7PDaVfEIgni7vV8KRcyAY5KvuMxgx6ADIEXNw==",
       "path": "dazinator.extensions.fileproviders/2.0.0",
       "hashPath": "dazinator.extensions.fileproviders.2.0.0.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml/3.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JogRPJNiE6kKvbuCqVRX691pPWeGMqdQgjrUwRYkdpfkMmtElfqAgcRR73geYj7OtBeEpstldZXXzJw27LUI9w==",
+      "path": "documentformat.openxml/3.3.0",
+      "hashPath": "documentformat.openxml.3.3.0.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml.Framework/3.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-R5CLzEoeyr7XDB7g3NTxRobcU19agaxVAhGZm+fZUShJGiU4bw8oUgnA2BNFepigJckfFMayOBMAbV3kDXNInA==",
+      "path": "documentformat.openxml.framework/3.3.0",
+      "hashPath": "documentformat.openxml.framework.3.3.0.nupkg.sha512"
     },
     "DotNet.Glob/3.1.0": {
       "type": "package",
@@ -3239,6 +3361,20 @@
       "sha512": "sha512-10wyoIwxDfF/6AkExeACfIZseTk4hJknBzlzPMCGsmBo+QrdyESwm1Q5YpO/zYjLzhz6aPzYUaXShraovSP3tg==",
       "path": "microsoft.entityframeworkcore.sqlserver/10.0.4",
       "hashPath": "microsoft.entityframeworkcore.sqlserver.10.0.4.nupkg.sha512"
+    },
+    "Microsoft.Extensions.AI/10.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hKLdKfwzwQ30Z5hA1DwHFvJJtRuyPmf41Es6t8DXW4PE/6caWK4qSDRY3i+QYmYbIVXnPlVR5xXQjYNz07giNg==",
+      "path": "microsoft.extensions.ai/10.2.0",
+      "hashPath": "microsoft.extensions.ai.10.2.0.nupkg.sha512"
+    },
+    "Microsoft.Extensions.AI.Abstractions/10.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ONGlIBht0ygEdKc0bCt9XWUiq19/460dAu7fCKzPM34OFJSMQIohEDTJwjCJ8vVp8znNakloc9xFF9+R/eDCYQ==",
+      "path": "microsoft.extensions.ai.abstractions/10.2.0",
+      "hashPath": "microsoft.extensions.ai.abstractions.10.2.0.nupkg.sha512"
     },
     "Microsoft.Extensions.AmbientMetadata.Application/10.0.0": {
       "type": "package",
@@ -3940,6 +4076,13 @@
       "path": "sixlabors.imagesharp.web/3.2.0",
       "hashPath": "sixlabors.imagesharp.web.3.2.0.nupkg.sha512"
     },
+    "SmartReader/0.11.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DSn2HErPhhaf+IIyFFQNAyPS1Z4Dv3EYLQlgHwdDlpDxolvB8RCDvTiQZGP3yg9tLMTT2eA9RIN7DbZLbiamhg==",
+      "path": "smartreader/0.11.0",
+      "hashPath": "smartreader.0.11.0.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
       "type": "package",
       "serviceable": true,
@@ -4031,6 +4174,13 @@
       "path": "system.interactive.async/7.0.0",
       "hashPath": "system.interactive.async.7.0.0.nupkg.sha512"
     },
+    "System.IO.Packaging/8.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KYkIOAvPexQOLDxPO2g0BVoWInnQhPpkFzRqvNrNrMhVT6kqhVr0zEb6KCHlptLFukxnZrjuMVAnxK7pOGUYrw==",
+      "path": "system.io.packaging/8.0.1",
+      "hashPath": "system.io.packaging.8.0.1.nupkg.sha512"
+    },
     "System.Linq.Async/7.0.0": {
       "type": "package",
       "serviceable": true,
@@ -4045,12 +4195,26 @@
       "path": "system.memory.data/8.0.1",
       "hashPath": "system.memory.data.8.0.1.nupkg.sha512"
     },
+    "System.Numerics.Tensors/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-EzimXy5WX7RJxf1pHBfolBApA4GR7qje1cY9XofD4C+cQepx0a5ZVlZjde8NHk+W1+6kltrbbfa8LIOVpTM6yQ==",
+      "path": "system.numerics.tensors/10.0.2",
+      "hashPath": "system.numerics.tensors.10.0.2.nupkg.sha512"
+    },
     "System.Security.Cryptography.ProtectedData/9.0.4": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-o94k2RKuAce3GeDMlUvIXlhVa1kWpJw95E6C9LwW0KlG0nj5+SgCiIxJ2Eroqb9sLtG1mEMbFttZIBZ13EJPvQ==",
       "path": "system.security.cryptography.protecteddata/9.0.4",
       "hashPath": "system.security.cryptography.protecteddata.9.0.4.nupkg.sha512"
+    },
+    "Umbraco.AI.Core/1.9.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dCBZthsNf8PUr0oX58HczQ8RuGH0BzJEpWfXhzeOEj8YuqWJtDqbAFcqjwFBnAaN8aMyNHGJODT73HXBEAb5/g==",
+      "path": "umbraco.ai.core/1.9.0",
+      "hashPath": "umbraco.ai.core.1.9.0.nupkg.sha512"
     },
     "Umbraco.Cms/17.3.4": {
       "type": "package",

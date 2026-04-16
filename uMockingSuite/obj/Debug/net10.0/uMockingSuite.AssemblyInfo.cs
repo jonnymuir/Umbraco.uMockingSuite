@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute(("Umbraco 17 backoffice package that gives snarky mocking advice when content is cr" +
     "eated."))]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+96c2d4cf0c9f7ff10185550167d6d13564be5a85")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+6a35bb3e13c46b9e64f23bfd539e90f673d40462")]
 [assembly: System.Reflection.AssemblyProductAttribute("uMockingSuite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("uMockingSuite")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.0.0")]
