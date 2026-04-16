@@ -53,9 +53,20 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
 
         try {
             const name = this.#documentContext?.getName?.() ?? 'this content';
-            const contentTypeRaw = this.#documentContext?.getContentTypeId?.() ?? this.#documentContext?.getContentType?.();
+
+            // Log raw data structures to identify alias location
+            const rawData = this.#documentContext?.getData?.();
+            console.log('[uMockingSuite] getData():', JSON.stringify(rawData)?.substring(0, 500));
+
+            const persistedData = this.#documentContext?.getPersistedData?.();
+            console.log('[uMockingSuite] getPersistedData():', JSON.stringify(persistedData)?.substring(0, 500));
+
             const contentTypeAlias =
-                (contentTypeRaw && typeof contentTypeRaw === 'object' ? contentTypeRaw.alias : contentTypeRaw) ?? 'unknown';
+                rawData?.contentType?.alias
+                ?? rawData?.contentTypeAlias
+                ?? persistedData?.contentType?.alias
+                ?? persistedData?.contentTypeAlias
+                ?? 'document';
 
             console.log('[uMockingSuite] fetching mocking message — name:', name, 'type:', contentTypeAlias);
 
