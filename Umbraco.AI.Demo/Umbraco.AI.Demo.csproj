@@ -10,6 +10,19 @@
     <ProjectReference Include="../uMockingSuite/uMockingSuite.csproj" />
   </ItemGroup>
 
+  <!-- Copy uMockingSuite App_Plugins into this project's source directory so
+       Umbraco can discover the package manifest at ContentRoot/App_Plugins. -->
+  <Target Name="CopyuMockingSuiteAppPlugins" BeforeTargets="Build">
+    <ItemGroup>
+      <_uMSPluginFiles Include="$(MSBuildProjectDirectory)/../uMockingSuite/App_Plugins/uMockingSuite/**/*" />
+    </ItemGroup>
+    <MakeDir Directories="$(MSBuildProjectDirectory)/App_Plugins/uMockingSuite" />
+    <Copy
+      SourceFiles="@(_uMSPluginFiles)"
+      DestinationFiles="@(_uMSPluginFiles->'$(MSBuildProjectDirectory)/App_Plugins/uMockingSuite/%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Clean" />
     <PackageReference Include="Umbraco.AI" />
