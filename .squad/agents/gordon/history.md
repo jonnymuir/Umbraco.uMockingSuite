@@ -26,3 +26,5 @@
 - Mock verification ensures proper service calls and logging behavior
 
 📌 Team update (2026-04-16T19-21-57Z): Umbraco 17.3.4 target confirmed — .NET 10.0 framework. umbraco-package.json manifest at uMockingSuite/Client/. Ready for backoffice UI components (Theresa) and notification delivery mechanism (Tony). — Rishi
+
+📌 Team update (2026-04-16T19:30:13Z): App_Plugins manifest wired for Umbraco 17 backoffice discovery — package build verified. Ready for integration tests to confirm backoffice loads manifest at startup. — Rishi

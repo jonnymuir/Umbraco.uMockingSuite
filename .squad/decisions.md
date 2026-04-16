@@ -46,3 +46,57 @@ Test stack selected for clarity, expressiveness, and Umbraco integration. xUnit 
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+# Decision: uMockingSuite Package Installation and Asset Delivery
+
+**By:** Rishi (Umbraco v17 Specialist)  
+**Date:** 2026-04-16  
+**Status:** Implemented
+
+## Context
+
+The uMockingSuite package needed to be properly installed and active when the Umbraco.AI.Demo site runs. The package consists of two parts:
+1. **Server-side components**: Composer, notification handlers, services (C#)
+2. **Client-side components**: Backoffice package manifest and future UI extensions
+
+## Decision
+
+Implemented the Umbraco 17 standard package asset delivery pattern:
+
+### Server-Side (Already Working)
+- Project reference from `Umbraco.AI.Demo.csproj` to `uMockingSuite.csproj` enables automatic composer discovery
+- `uMockingSuiteComposer : IComposer` is auto-discovered and registered by Umbraco at startup
+- No additional configuration needed
+
+### Client-Side (Implemented)
+- **Package manifest location**: `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json`
+- **Build configuration**: Added `<Content Include="App_Plugins\**" CopyToOutputDirectory="Always" />` to `uMockingSuite.csproj`
+- **Deployment**: MSBuild copies App_Plugins folder to both package bin and host site bin outputs
+
+## Rationale
+
+This follows Umbraco 17's expected package structure:
+1. **App_Plugins convention**: Backoffice packages must place their `umbraco-package.json` under `App_Plugins/{PackageName}/`
+2. **Build-time copy**: Using `CopyToOutputDirectory="Always"` ensures assets flow through the ProjectReference chain
+3. **No runtime complexity**: No need for embedded resources, custom middleware, or manual file copying
+4. **Development-friendly**: Same structure works for both local development (ProjectReference) and NuGet package distribution
+
+## Implementation Changes
+
+### Files Modified
+- `uMockingSuite/uMockingSuite.csproj` — added `<ItemGroup>` with `<Content>` directive
+
+### Files Created
+- `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json` — copied from `Client/umbraco-package.json`
+
+### Verified Outputs
+- ✅ Build succeeds with no errors
+- ✅ `App_Plugins/uMockingSuite/umbraco-package.json` present in package bin output
+- ✅ `App_Plugins/uMockingSuite/umbraco-package.json` present in host site bin output
+- ✅ Composer auto-discovery confirmed (via `IComposer` interface and ProjectReference)
+
+## Future Considerations
+
+When Theresa adds TypeScript/Lit UI extensions:
+- Place compiled JS bundle at `App_Plugins/uMockingSuite/dist/bundle.js`
+- Update `umbraco-package.json` to reference the bundle in the `extensions` array
+- The existing `<Content Include="App_Plugins\**">` directive will automatically copy all new client assets

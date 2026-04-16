@@ -25,3 +25,13 @@
   - `Umbraco.Cms.Core.Models` - IContent and other content models
 
 📌 Team update (2026-04-16T19-21-57Z): Package structure ready — .NET 10.0, Umbraco 17.3.4, local version management. Notification pipeline scaffolded. 19 tests passing. — Boris
+
+### 2026-04-16: Umbraco 17 Package Asset Delivery Pattern
+- **App_Plugins Standard:** In Umbraco 17, backoffice packages must deliver `umbraco-package.json` via `App_Plugins/{PackageName}/` directory
+- **Project Structure:** 
+  - Created `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json` (copied from Client folder)
+  - Added `<Content Include="App_Plugins\**" CopyToOutputDirectory="Always" />` to `.csproj`
+- **Deployment Flow:** Build process copies App_Plugins to both package bin output AND host site bin output via ProjectReference
+- **Composer Discovery:** `IComposer` implementations are auto-discovered from referenced assemblies - no additional configuration needed
+- **Verification:** Build successful, App_Plugins folder confirmed in both `/uMockingSuite/bin/Debug/net10.0/App_Plugins/uMockingSuite/` and `/Umbraco.AI.Demo/bin/Debug/net10.0/App_Plugins/uMockingSuite/`
+- **Notes:** The `Client/umbraco-package.json` remains as source, but runtime discovery happens from `App_Plugins/` location
