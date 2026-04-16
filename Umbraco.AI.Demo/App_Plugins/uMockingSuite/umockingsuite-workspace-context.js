@@ -9,7 +9,6 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
     #notificationContext;
     #documentContext;
     #authContext;
-    #wasSubmitting = undefined;
     #isFetchingMockMessage = false;
 
     constructor(host) {
@@ -30,42 +29,59 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
             console.log('[uMockingSuite] ✅ Got document workspace context', context);
             this.#documentContext = context;
 
-            // Diagnostic: log all prototype chain properties
+            // 1. Log ALL prototype chain properties (JSON.stringify avoids browser truncation)
             const protoProps = new Set();
             let p = Object.getPrototypeOf(context);
             while (p && p !== Object.prototype) {
                 Object.getOwnPropertyNames(p).forEach(n => protoProps.add(n));
                 p = Object.getPrototypeOf(p);
             }
-            console.log('[uMockingSuite] Document context prototype properties:', [...protoProps].filter(n => !n.startsWith('#')).sort());
+            console.log('[uMockingSuite] PROTO PROPS:', JSON.stringify([...protoProps].sort()));
 
-            // PRIMARY: wrap requestSubmit to intercept successful saves
-            if (typeof context.requestSubmit === 'function') {
-                const originalRequestSubmit = context.requestSubmit.bind(context);
-                context.requestSubmit = async (...args) => {
-                    console.log('[uMockingSuite] 🎯 requestSubmit intercepted — waiting for completion...');
+            // 2. Dynamically wrap every proto method whose name contains save/submit/handle/request/publish
+            const targetPattern = /save|submit|handle|request|publish/i;
+            for (const name of protoProps) {
+                if (!targetPattern.test(name)) continue;
+                if (typeof context[name] !== 'function') continue;
+                const orig = context[name].bind(context);
+                context[name] = async (...args) => {
+                    console.log(`[uMockingSuite] 🔍 ${name} called`, args);
                     try {
-                        await originalRequestSubmit(...args);
-                        console.log('[uMockingSuite] ✅ requestSubmit completed successfully — triggering handler');
-                        this.#handleSaveCompleted();
+                        const result = await orig(...args);
+                        console.log(`[uMockingSuite] ✅ ${name} completed`);
+                        return result;
                     } catch (e) {
-                        console.warn('[uMockingSuite] ⚠️ requestSubmit threw:', e);
+                        console.warn(`[uMockingSuite] ⚠️ ${name} threw:`, e);
+                        throw e;
                     }
                 };
-            } else {
-                console.warn('[uMockingSuite] ⚠️ context.requestSubmit is not a function — trying prototype:', typeof Object.getPrototypeOf(context)?.requestSubmit);
             }
 
-            // SECONDARY (fallback): observe isSubmitting, ignoring initial undefined emission
-            this.observe(context.isSubmitting, (isSubmitting) => {
-                console.log('[uMockingSuite] isSubmitting changed:', isSubmitting);
-                if (isSubmitting === undefined) return;
-                if (this.#wasSubmitting === true && isSubmitting === false) {
-                    console.log('[uMockingSuite] 🎯 isSubmitting true→false detected');
-                    this.#handleSaveCompleted();
+            // 3. Belt-and-braces: also wrap specific names in case they're on the instance only
+            const specificNames = ['requestSubmit', 'submit', '_handleSave', '_handleSubmit', 'save', 'publish'];
+            for (const methodName of specificNames) {
+                if (typeof context[methodName] === 'function') {
+                    const orig = context[methodName].bind(context);
+                    context[methodName] = async (...args) => {
+                        console.log(`[uMockingSuite] 🔍 ${methodName} called`, args);
+                        try {
+                            const result = await orig(...args);
+                            console.log(`[uMockingSuite] ✅ ${methodName} completed`);
+                            return result;
+                        } catch (e) {
+                            console.warn(`[uMockingSuite] ⚠️ ${methodName} threw:`, e);
+                            throw e;
+                        }
+                    };
                 }
-                this.#wasSubmitting = isSubmitting;
-            });
+            }
+
+            // 6. Click listener diagnostic — correlate button clicks with saves
+            this._host?.addEventListener?.('click', (e) => {
+                if (e.target?.tagName === 'BUTTON' || e.target?.closest?.('button')) {
+                    console.log('[uMockingSuite] 🖱️ Button click:', e.target?.textContent?.trim(), e.target);
+                }
+            }, true);
         });
     }
 
