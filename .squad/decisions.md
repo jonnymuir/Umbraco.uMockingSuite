@@ -100,3 +100,51 @@ When Theresa adds TypeScript/Lit UI extensions:
 - Place compiled JS bundle at `App_Plugins/uMockingSuite/dist/bundle.js`
 - Update `umbraco-package.json` to reference the bundle in the `extensions` array
 - The existing `<Content Include="App_Plugins\**">` directive will automatically copy all new client assets
+
+---
+
+### 2026-04-16: Umbraco 17 Toast Notification via workspaceContext
+**By:** Theresa (UI/Frontend Expert)  
+**Status:** Implemented
+
+Implemented using Umbraco 17's `workspaceContext` extension pattern with `UmbControllerBase` (not LitElement). Observes `UMB_DOCUMENT_WORKSPACE_CONTEXT.isSubmitting` state transitions (`true` → `false`) to detect save completion. Fetch calls Management API with bearer token from `UMB_AUTH_CONTEXT`. Uses `UMB_NOTIFICATION_CONTEXT.peek()` with warning type for display. Manifest field is `api` (not `element`) for workspaceContext extensions. Silent error handling prevents disrupting save workflow.
+
+**Key Files:**
+- `uMockingSuite/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js`
+- `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json` (extended)
+
+---
+
+### 2026-04-16: uMockingSuite Management API Endpoint
+**By:** Rishi (Umbraco v17 Specialist)  
+**Status:** Implemented (pending Tony's AI service completion)
+
+Implemented Umbraco 17 Management API controller at `/umbraco/management/api/v1/umockingsuite/mocking-message`. Extends `ManagementApiControllerBase`, versioned with `[ApiVersion("1.0")]`, protected with `[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]`. Accepts `contentName` and `contentTypeAlias` query parameters. Delegates to `IMockingService.GetMockingMessageAsync()` for message generation. Returns `{ "message": "..." }` JSON. Switched notification handler from pre-save to post-save (`ContentSavedNotification`) since JS can only call API after save completes.
+
+**Key Files:**
+- `uMockingSuite/Controllers/MockingController.cs`
+- `uMockingSuite/Notifications/ContentSavedNotificationHandler.cs` (renamed from ContentSavingNotificationHandler)
+- `uMockingSuite/Services/IMockingService.cs` (added async method)
+
+---
+
+### 2026-04-16: Claude AI Integration in MockingService
+**By:** Tony (Backend Dev)  
+**Status:** Implemented
+
+Integrated Claude via `Umbraco.AI.Core.Chat.IAIChatService` inline builder API. Added `Umbraco.AI.Core` 1.9.0 to `uMockingSuite.csproj` with `<PrivateAssets>all</PrivateAssets>` to prevent DLL copy (host provides at runtime). Uses `builder.WithAlias("chat")` to leverage default chat profile. Fallback to deterministic hash-based selection if AI service unavailable or throws exception. System prompt instructs Claude to give short, witty, snarky 1-2 sentence critiques without emoji/hashtags (plain text only).
+
+**Key Files:**
+- `uMockingSuite/Services/MockingService.cs` (AI implementation with fallback)
+- `uMockingSuite/uMockingSuite.csproj` (added dependency)
+
+---
+
+### 2026-04-17: Authenticated Fetch in uMockingSuite Workspace Context
+**By:** Theresa (UI/Frontend Expert)  
+**Status:** Implemented
+
+Fixed silent 401 failures in fetch request. Root cause: `MockingController` endpoint requires `[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]` but fetch had no Authorization header. Solution: Import `UMB_AUTH_CONTEXT` from `@umbraco-cms/backoffice/auth`, consume in constructor, call `await this.#authContext?.getLatestToken()` before fetch, and pass `Authorization: Bearer <token>` in headers. Added defensive fallbacks: `getName()` can return null on first observation (fallback to `'this content'`); `getContentType()` may return object or string (handle both); removed hard guards; added `console.debug` logging for DevTools verification.
+
+**Key Files:**
+- `uMockingSuite/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js`
