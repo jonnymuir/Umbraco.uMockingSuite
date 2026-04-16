@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.umbraco.com/umbraco-cms/v/17.latest/extending/customize-the-backoffice/umbraco-package-manifest",
+  "name": "uMockingSuite",
+  "version": "0.1.0",
+  "allowPublicAccess": false,
+  "extensions": []
+}

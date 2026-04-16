@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Umbraco.AI.Demo/Umbraco.AI.Demo.csproj" />
+  <Project Path="uMockingSuite/uMockingSuite.csproj" />
+  <Project Path="uMockingSuite.Tests/uMockingSuite.Tests.csproj" />
+</Solution>
