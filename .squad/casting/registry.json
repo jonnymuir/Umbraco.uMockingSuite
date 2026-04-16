@@ -1,0 +1,60 @@
+{
+  "agents": {
+    "boris": {
+      "persistent_name": "Boris",
+      "universe": "British Prime Ministers",
+      "role": "Lead & Architect",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "rishi": {
+      "persistent_name": "Rishi",
+      "universe": "British Prime Ministers",
+      "role": "Umbraco v17 Specialist",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "theresa": {
+      "persistent_name": "Theresa",
+      "universe": "British Prime Ministers",
+      "role": "UI/Frontend Expert",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "tony": {
+      "persistent_name": "Tony",
+      "universe": "British Prime Ministers",
+      "role": "Backend Dev",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "gordon": {
+      "persistent_name": "Gordon",
+      "universe": "British Prime Ministers",
+      "role": "Tester/QA",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "scribe": {
+      "persistent_name": "Scribe",
+      "universe": "exempt",
+      "role": "Session Logger",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "ralph": {
+      "persistent_name": "Ralph",
+      "universe": "exempt",
+      "role": "Work Monitor",
+      "created_at": "2026-04-16",
+      "legacy_named": false,
+      "status": "active"
+    }
+  }
+}

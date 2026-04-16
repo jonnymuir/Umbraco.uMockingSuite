@@ -1,0 +1,24 @@
+{
+  "universe_usage_history": [
+    {
+      "universe": "British Prime Ministers",
+      "assignment_id": "umockingsuite-2026-04-16",
+      "used_at": "2026-04-16"
+    }
+  ],
+  "assignment_cast_snapshots": {
+    "umockingsuite-2026-04-16": {
+      "universe": "British Prime Ministers",
+      "project": "uMockingSuite",
+      "cast": [
+        { "name": "Boris", "role": "Lead & Architect" },
+        { "name": "Rishi", "role": "Umbraco v17 Specialist" },
+        { "name": "Theresa", "role": "UI/Frontend Expert" },
+        { "name": "Tony", "role": "Backend Dev" },
+        { "name": "Gordon", "role": "Tester/QA" },
+        { "name": "Scribe", "role": "Session Logger" },
+        { "name": "Ralph", "role": "Work Monitor" }
+      ]
+    }
+  }
+}
