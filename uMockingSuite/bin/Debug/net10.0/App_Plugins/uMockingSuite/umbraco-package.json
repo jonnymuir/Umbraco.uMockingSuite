@@ -15,6 +15,23 @@
           "match": "Umb.Workspace.Document"
         }
       ]
+    },
+    {
+      "type": "dashboard",
+      "alias": "uMockingSuite.Dashboard.Settings",
+      "name": "uMockingSuite Settings",
+      "element": "/App_Plugins/uMockingSuite/umockingsuite-settings.js",
+      "elementName": "umockingsuite-settings",
+      "meta": {
+        "label": "uMockingSuite",
+        "pathname": "umockingsuite"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Settings"
+        }
+      ]
     }
   ]
 }

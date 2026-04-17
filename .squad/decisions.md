@@ -148,3 +148,161 @@ Fixed silent 401 failures in fetch request. Root cause: `MockingController` endp
 
 **Key Files:**
 - `uMockingSuite/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js`
+
+---
+
+### 2026-04-17: Save Detection Approach for uMockingSuite
+**By:** Theresa (UI/Frontend Expert)  
+**Status:** Implemented
+
+In Umbraco 17.3.4, the `isSubmitting` observable on `UmbDocumentWorkspaceContext` emits `undefined` once on load and then never again. The save button does not update this observable. Solution: Use two complementary strategies:
+
+**PRIMARY:** Wrap `requestSubmit` on the context instance
+```javascript
+const originalRequestSubmit = context.requestSubmit.bind(context);
+context.requestSubmit = async (...args) => {
+    await originalRequestSubmit(...args);
+    this.#handleSaveCompleted();
+};
+```
+The save button calls `requestSubmit()` on the document workspace context. Monkey-patching the instance method allows reliable interception without private API access.
+
+**SECONDARY:** Fixed `isSubmitting` observer (fallback)
+- Skip `undefined` emissions (the initial load emission)
+- Only fire on a strict `true → false` transition
+- Initialize `#wasSubmitting = undefined` (not `false`) so the first real emission doesn't false-trigger
+
+**Additional Details:**
+- `#isFetchingMockMessage` guard prevents double-firing if both strategies trigger simultaneously
+- `finally` block resets guard so subsequent saves always work
+- Prototype chain property enumeration logged on context acquisition for ongoing diagnostics
+
+**Key Files:**
+- `uMockingSuite/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js`
+
+---
+
+### 2026-04-17: Settings Dashboard UI Implementation
+**By:** Theresa (UI/Frontend Expert)  
+**Status:** Implemented
+
+Created a settings dashboard in the Umbraco 17 backoffice where users select which AI profile to use for generating mocking comments.
+
+**Component Architecture:**
+- **Element Type:** `LitElement` with `UmbElementMixin` (dashboard elements are UI components)
+- **File:** `umockingsuite-settings.js` — vanilla JS module, no build step
+- **Custom Element:** `umockingsuite-settings`
+
+**UI Components:**
+- Layout: `<uui-box>` for card container
+- Form Control: `<uui-select>` with `<uui-select-option>` for profile dropdown
+- Actions: `<uui-button>` with `look="primary"` and `color="positive"`
+- Feedback: Inline status messages with conditional CSS classes (success/error/loading)
+
+**Data Flow:**
+1. **On Load:** Parallel fetch of profiles and current settings using `Promise.all`
+2. **Auth Pattern:** Consume `UMB_AUTH_CONTEXT`, call `getLatestToken()`, pass as `Authorization: Bearer` header
+3. **On Save:** PUT request to settings endpoint with inline status and notification toast
+4. **Error Handling:** HTTP status checks with user-friendly messages
+
+**Manifest Configuration:**
+```json
+{
+  "type": "dashboard",
+  "alias": "uMockingSuite.Dashboard.Settings",
+  "element": "/App_Plugins/uMockingSuite/umockingsuite-settings.js",
+  "elementName": "umockingsuite-settings",
+  "meta": {
+    "label": "uMockingSuite",
+    "pathname": "umockingsuite"
+  },
+  "conditions": [{
+    "alias": "Umb.Condition.SectionAlias",
+    "match": "Umb.Section.Settings"
+  }]
+}
+```
+
+**Styling:** Uses Umbraco design tokens (`--uui-*` CSS custom properties), responsive layout (max-width: 480px), semantic color tokens for status messages.
+
+**API Contract:**
+- `GET /umbraco/management/api/v1/umockingsuite/profiles` → `[{alias, name, ...}]` (array)
+- `GET /umbraco/management/api/v1/umockingsuite/settings` → `{profileAlias: string}`
+- `PUT /umbraco/management/api/v1/umockingsuite/settings` → `{profileAlias: string}` (body & response)
+
+**Rationale:**
+1. No build step ensures immediate deployment
+2. Parallel loading reduces page load time
+3. Dual feedback (inline + toast) provides clear UX
+4. Design system compliance ensures native Umbraco appearance
+5. Settings section placement matches configuration purpose
+
+**Files Modified:**
+- Created: `uMockingSuite/App_Plugins/uMockingSuite/umockingsuite-settings.js`
+- Modified: `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json` (dashboard extension)
+- Copied to: `Umbraco.AI.Demo/App_Plugins/uMockingSuite/`
+
+---
+
+### 2026-04-17: Settings Backend - Profile Selection API
+**By:** Tony (Backend Dev)  
+**Status:** Implemented
+
+The `MockingService` was hardcoded to use `.WithAlias("chat")` but no profile with that alias exists—only "default-chat" is seeded. Users need the ability to choose which AI profile to use from their configured profiles.
+
+**Three-Layer Solution:**
+
+**1. Settings Service Layer**
+- **Interface:** `IUMockingSuiteSettingsService`
+  - `Task<string> GetProfileAliasAsync()` — Returns profile alias, defaults to "default-chat"
+  - `Task SetProfileAliasAsync(string alias)` — Saves profile alias
+- **Implementation:** `UMockingSuiteSettingsService`
+  - Uses Umbraco's `IKeyValueService` for persistent storage (storage key: `"uMockingSuite.ProfileAlias"`)
+  - `IKeyValueService` is synchronous; wrapped with `Task.FromResult()` and `Task.CompletedTask` for async API
+  - Default fallback: "default-chat" (matches seed data, not "chat")
+
+**2. Management API Layer**
+- **Controller:** `SettingsController` at `/umbraco/management/api/v1/umockingsuite`
+
+Three endpoints:
+
+**GET `/settings`**
+- Returns: `{profileAlias: "default-chat"}`
+- Used by UI to load current configuration
+
+**PUT `/settings`**
+- Body: `{profileAlias: "new-alias"}`
+- Returns: `{profileAlias: "new-alias"}`
+- Validates that alias is not empty
+
+**GET `/profiles`**
+- Returns: `[{id: guid, alias: "default-chat", name: "Default Chat", capability: "Chat"}, ...]`
+- Returns array directly (not wrapped in object)
+- Filters to `AICapability.Chat` profiles only
+- Uses `IAIProfileService.GetProfilesAsync(AICapability.Chat, ct)` from Umbraco.AI.Core
+
+**3. Service Integration**
+- Injected `IUMockingSuiteSettingsService` into `MockingService`
+- In `GetMockingMessageAsync()`, calls `await _settingsService.GetProfileAliasAsync()`
+- Passes result to `builder.WithAlias(profileAlias)` instead of hardcoded "chat"
+- Registered as Scoped in `uMockingSuiteComposer`
+
+**Key Discovery: IAIProfileService**
+- `GetProfilesAsync(AICapability capability, CancellationToken ct)` — All profiles for capability
+- `GetProfileByAliasAsync(string alias, CancellationToken ct)` — Specific profile
+- Avoided: Direct SQLite queries, HTTP calls to Umbraco AI API, static/hardcoded lists
+
+**API Response Patterns:**
+- **List endpoints** (`/profiles`) → return arrays directly `[{...}, {...}]`
+- **Detail/settings endpoints** (`/settings`) → return objects `{profileAlias: "..."}`
+
+**Files Created:**
+- `uMockingSuite/Services/IUMockingSuiteSettingsService.cs`
+- `uMockingSuite/Services/UMockingSuiteSettingsService.cs`
+- `uMockingSuite/Controllers/SettingsController.cs`
+
+**Files Modified:**
+- `uMockingSuite/Services/MockingService.cs` — Settings service injection and profile alias lookup
+- `uMockingSuite/Composers/uMockingSuiteComposer.cs` — Settings service registration
+
+**Testing:** Build succeeded, App_Plugins copied correctly, profile alias default matches seed data.

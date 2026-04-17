@@ -17,11 +17,16 @@ public class MockingService : IMockingService
     ];
 
     private readonly IAIChatService? _chatService;
+    private readonly IUMockingSuiteSettingsService _settingsService;
     private readonly ILogger<MockingService> _logger;
 
-    public MockingService(ILogger<MockingService> logger, IAIChatService? chatService = null)
+    public MockingService(
+        ILogger<MockingService> logger, 
+        IUMockingSuiteSettingsService settingsService,
+        IAIChatService? chatService = null)
     {
         _logger = logger;
+        _settingsService = settingsService;
         _chatService = chatService;
     }
 
@@ -41,6 +46,9 @@ public class MockingService : IMockingService
 
         try
         {
+            var profileAlias = await _settingsService.GetProfileAliasAsync();
+            _logger.LogInformation("Using AI profile: {ProfileAlias}", profileAlias);
+
             var systemPrompt = """
                 You are a brutally honest, passive-aggressive content critic embedded in a CMS. 
                 An editor has just saved content. Your job is to give them a short, witty, mocking comment 
@@ -58,7 +66,7 @@ public class MockingService : IMockingService
             };
 
             var response = await _chatService.GetChatResponseAsync(
-                configure: builder => builder.WithAlias("chat"),
+                configure: builder => builder.WithAlias(profileAlias),
                 messages: messages,
                 cancellationToken: default);
 

@@ -12,6 +12,7 @@ public class uMockingSuiteComposer : IComposer
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<IMockingService, MockingService>();
+        builder.Services.AddScoped<IUMockingSuiteSettingsService, UMockingSuiteSettingsService>();
         builder.AddNotificationHandler<ContentSavedNotification, ContentSavedNotificationHandler>();
     }
 }

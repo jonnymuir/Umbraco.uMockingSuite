@@ -12,3 +12,4 @@
 /Users/jonnymuir/Documents/Projects/Umbraco.AI.Demo/uMockingSuite/obj/Debug/net10.0/ref/uMockingSuite.dll
 /Users/jonnymuir/Documents/Projects/Umbraco.AI.Demo/uMockingSuite/bin/Debug/net10.0/App_Plugins/uMockingSuite/umbraco-package.json
 /Users/jonnymuir/Documents/Projects/Umbraco.AI.Demo/uMockingSuite/bin/Debug/net10.0/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js
+/Users/jonnymuir/Documents/Projects/Umbraco.AI.Demo/uMockingSuite/bin/Debug/net10.0/App_Plugins/uMockingSuite/umockingsuite-settings.js
