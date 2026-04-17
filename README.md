@@ -51,7 +51,6 @@ Looking ahead, uMockingSuite is the prototype for **disengage**, a more refined 
 - ⚙️ **Configurable AI profiles** — Choose which Umbraco AI profile to use via the Settings dashboard
 - 🔌 **Provider-agnostic** — Works with any AI provider configured in Umbraco AI (Claude, OpenAI, Google, etc.)
 - 🛡️ **Graceful fallbacks** — If AI service is unavailable, falls back to deterministic snarky messages
-- 🧪 **Test-driven** — 19 passing tests demonstrating notification handling and service logic
 
 ## Requirements
 
