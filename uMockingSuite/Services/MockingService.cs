@@ -6,6 +6,10 @@ using uMockingSuite.Models;
 
 namespace uMockingSuite.Services;
 
+/// <summary>
+/// Generates mocking messages for content save events, using AI when available
+/// or falling back to a curated set of snarky defaults.
+/// </summary>
 public class MockingService : IMockingService
 {
     private static readonly string[] DefaultMessages =
@@ -21,6 +25,12 @@ public class MockingService : IMockingService
     private readonly IUMockingSuiteSettingsService _settingsService;
     private readonly ILogger<MockingService> _logger;
 
+    /// <summary>
+    /// Initialises a new instance of <see cref="MockingService"/>.
+    /// </summary>
+    /// <param name="logger">Logger for diagnostic output.</param>
+    /// <param name="settingsService">Service for retrieving persisted settings.</param>
+    /// <param name="chatService">Optional AI chat service; if absent, falls back to defaults.</param>
     public MockingService(
         ILogger<MockingService> logger, 
         IUMockingSuiteSettingsService settingsService,
@@ -31,12 +41,14 @@ public class MockingService : IMockingService
         _chatService = chatService;
     }
 
+    /// <inheritdoc />
     public string GetMockingMessage(IContent content)
     {
         var index = Math.Abs(content.Name?.GetHashCode() ?? 0) % DefaultMessages.Length;
         return $"[uMockingSuite on '{content.Name}' ({content.ContentType.Alias})]: {DefaultMessages[index]}";
     }
 
+    /// <inheritdoc />
     public async Task<MockingResponse> GetMockingMessageAsync(ContentSaveContext context)
     {
         if (_chatService == null)

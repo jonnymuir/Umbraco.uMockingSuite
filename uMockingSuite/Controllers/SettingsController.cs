@@ -10,6 +10,10 @@ using uMockingSuite.Services;
 
 namespace uMockingSuite.Controllers;
 
+/// <summary>
+/// Backoffice management API controller for managing uMockingSuite settings
+/// and retrieving available AI profiles.
+/// </summary>
 [ApiVersion("1.0")]
 [ApiExplorerSettings(GroupName = "uMockingSuite")]
 [Route("umbraco/management/api/v{version:apiVersion}/umockingsuite")]
@@ -20,6 +24,12 @@ public class SettingsController : ManagementApiControllerBase
     private readonly IAIProfileService _profileService;
     private readonly ILogger<SettingsController> _logger;
 
+    /// <summary>
+    /// Initialises a new instance of <see cref="SettingsController"/>.
+    /// </summary>
+    /// <param name="settingsService">Service for persisting uMockingSuite settings.</param>
+    /// <param name="profileService">Umbraco AI profile service.</param>
+    /// <param name="logger">Logger for diagnostic output.</param>
     public SettingsController(
         IUMockingSuiteSettingsService settingsService,
         IAIProfileService profileService,
@@ -30,6 +40,10 @@ public class SettingsController : ManagementApiControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Gets the current uMockingSuite settings including the active AI profile alias.
+    /// </summary>
+    /// <returns>A JSON object with the active <c>profileAlias</c>.</returns>
     [HttpGet("settings")]
     public async Task<IActionResult> GetSettings()
     {
@@ -46,6 +60,11 @@ public class SettingsController : ManagementApiControllerBase
         }
     }
 
+    /// <summary>
+    /// Updates the active AI profile alias used for mocking responses.
+    /// </summary>
+    /// <param name="request">Request body containing the new <c>profileAlias</c>.</param>
+    /// <returns>A JSON object confirming the updated <c>profileAlias</c>.</returns>
     [HttpPut("settings")]
     public async Task<IActionResult> UpdateSettings([FromBody] UpdateSettingsRequest request)
     {
@@ -68,6 +87,10 @@ public class SettingsController : ManagementApiControllerBase
         }
     }
 
+    /// <summary>
+    /// Gets all AI profiles that are configured and capable of chat.
+    /// </summary>
+    /// <returns>A JSON array of profile objects with <c>id</c>, <c>alias</c>, <c>name</c>, and <c>capability</c>.</returns>
     [HttpGet("profiles")]
     public async Task<IActionResult> GetProfiles()
     {
@@ -96,8 +119,14 @@ public class SettingsController : ManagementApiControllerBase
         }
     }
 
+    /// <summary>
+    /// Request body for updating uMockingSuite settings.
+    /// </summary>
     public class UpdateSettingsRequest
     {
+        /// <summary>
+        /// The alias of the AI profile to use for mocking responses.
+        /// </summary>
         public string ProfileAlias { get; set; } = string.Empty;
     }
 }
