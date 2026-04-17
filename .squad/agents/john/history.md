@@ -27,6 +27,49 @@
 
 ## Learnings
 
+### 2026-04-17: README Squad Section Polished for Wit & Balance
+
+**Context:** Jonny requested an update to the README's "Built with Squad" section to better showcase Squad as the AI orchestration tool while keeping the meta-joke (AI package about AI, built by AI) front and centre without overshadowing the main uMockingSuite story.
+
+**What I Did:**
+
+1. **Added forward reference in Hackathon Context section:**
+   - Inserted a "Meta note:" paragraph acknowledging the delightful absurdity of an AI package built by an AI team
+   - Hyperlinked to the "Built with Squad" section below for readers curious about how
+
+2. **Rewrote "Built with Squad" section:**
+   - Opened with punchy confession: "Yes, really. This package—which mocks your content with AI—was built entirely by an AI team."
+   - Expanded Squad explanation: described it as "an AI team system for GitHub Copilot" with persistent memory, charters, and decision logs
+   - Added dry humor about governance: "ironically, is more structured governance than most actual software teams manage"
+   - Kept roster table unchanged (Boris through John with their roles)
+   - Added wit about the Westminster casting: acknowledged it's Squad's personality quirk, then joked that this AI team was considerably more reliable at shipping than the real PMs
+   - Highlighted Squad's key strengths: maintaining context, precision handoffs, task completion
+   - Closed with reference to `.squad/` charters and decision logs
+
+3. **Committed and pushed:**
+   - Commit message: "docs: sharpen Squad section in README — meta-joke lands better"
+   - Pushed to origin/main
+
+**Key Decisions:**
+
+- **Lead with the joke:** The opening "Yes, really" makes it clear this is the fun part of the story, not a distraction from uMockingSuite itself
+- **Balance tone:** Used dry wit rather than enthusiasm—the Commonwealth PM casting is funny without being cringey when delivered matter-of-factly
+- **Forward reference:** The "Meta note:" in Hackathon Context tells readers this joke exists without derailing the main narrative
+- **Preserved all existing content:** No removal of roster, roles, or .squad/ reference—just reshaped for better impact
+
+**Verification:**
+- ✅ README reads with better narrative flow
+- ✅ Meta-joke lands with proper setup and punchline
+- ✅ Squad's orchestration capabilities clearly explained
+- ✅ Westminster casting gets appropriate wit treatment
+- ✅ All commits pushed to origin/main
+
+---
+
+### 2026-04-17: README Moved to Repo Root
+
+README.md is now at the repo root (not `uMockingSuite/README.md`). The `.csproj` `<None Include>` reference updated to `..\README.md` so NuGet packaging still picks it up correctly. Added "Built with Squad" section documenting the UK PM–themed AI team. Commit pushed to origin/main.
+
 ### 2026-04-17: GitHub Publication & Repository Setup
 
 **Context:** Jonny requested full project publication to a new GitHub repository with proper .gitignore configuration to prevent build artifacts from being tracked.
