@@ -6,6 +6,24 @@
 [![Umbraco](https://img.shields.io/badge/Umbraco-17.x-blue?style=flat-square)](https://umbraco.com)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
+## The Package in Action
+
+Every content save gets a unique, context-aware AI critique. Here are two examples of uMockingSuite in the wild:
+
+![AI-powered toast notification: snarky critique of saved content](image-3.png)
+
+![Another unique AI critique highlighting content details](image-4.png)
+
+### Getting Started
+
+To use uMockingSuite, you'll need to set up a few things in the Umbraco AI package first:
+
+![Configure AI providers (Claude, OpenAI, Google) in Umbraco AI connections](image.png)
+
+![Create a chat profile in Umbraco AI profiles](image-1.png)
+
+![Adjust profile settings like model and temperature](image-2.png)
+
 ## About
 
 uMockingSuite was built at the **Manchester Umbraco AI Hackathon** as a demonstration of how easy it is to get started with the Umbraco AI package. When a content editor saves content in the Umbraco 17 backoffice, uMockingSuite intercepts the event, sends the content details to your configured AI provider (Claude, OpenAI, Google, etc.), and displays a short, witty, passive-aggressive toast notification critiquing their work.
