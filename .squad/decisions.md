@@ -306,3 +306,379 @@ Three endpoints:
 - `uMockingSuite/Composers/uMockingSuiteComposer.cs` — Settings service registration
 
 **Testing:** Build succeeded, App_Plugins copied correctly, profile alias default matches seed data.
+
+### 2026-04-17: README moved to repo root
+**By:** John (DevRel & Release Engineer)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+The README was located at `uMockingSuite/README.md` (inside the package project folder). GitHub surfaces the README from the repo root by default, so it was not visible on the repository's front page.
+
+## Decision
+
+- Move `README.md` to the repo root.
+- Update `uMockingSuite/uMockingSuite.csproj` `<None Include>` path from `README.md` to `..\README.md` so NuGet pack still bundles it correctly.
+- Add a "Built with Squad" section to the README documenting the AI team and the UK Prime Ministers casting.
+
+## Rationale
+
+- **GitHub discoverability:** README at root is rendered automatically on the repo homepage.
+- **NuGet compatibility:** The `<None Include="..\README.md" PackagePath="\">` pattern is standard for referencing files outside the project directory.
+- **Transparency:** Documenting that this was built with an AI Squad team adds interesting context for the community and celebrates the hackathon/Squad experiment.
+
+## Impact
+
+- `README.md` is now at repo root and visible on GitHub.
+- `.csproj` updated — no pack regression.
+- Committed and pushed to `origin/main` (commit `c2159ca`).
+
+---
+
+### 2026-04-17: GitHub Actions CI Workflow
+**By:** Tony (Backend Dev)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+No CI pipeline existed for the uMockingSuite project. Without automated checks, pushes and PRs could break the build or tests without immediate visibility.
+
+## Decision
+
+Created `.github/workflows/ci.yml` to run on every push to `main` and every pull request targeting `main`.
+
+**Workflow steps:**
+1. Checkout code
+2. Setup .NET 10.0.x (matches project target framework)
+3. `dotnet restore Umbraco.AI.Demo.slnx` — explicit solution reference to avoid ambiguity
+4. `dotnet build --no-restore --configuration Release`
+5. `dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"`
+6. Upload `*.trx` test results as artifact (always runs, even on failure)
+
+## Rationale
+
+- Explicit `Umbraco.AI.Demo.slnx` reference on all dotnet commands — solution file is not the default `.sln` name, so explicit reference prevents any ambiguity on the CI runner
+- Release configuration used throughout for consistent, optimised output
+- xUnit test runner (2.9.3 + xunit.runner.visualstudio 3.1.1) works natively with `dotnet test`
+- TRX artifact upload with `if: always()` ensures test results are preserved even when tests fail — useful for diagnosis
+- .NET 10.0.x version pin matches `net10.0` TargetFramework in both `uMockingSuite.csproj` and `uMockingSuite.Tests.csproj`
+
+## Files Created
+
+- `.github/workflows/ci.yml`
+
+---
+
+### 2026-04-17: NuGet Publishing & Umbraco Marketplace Setup
+**By:** John (DevRel & Release Engineer)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+The uMockingSuite package was ready to publish but lacked NuGet publishing infrastructure:
+- `.csproj` had `YOUR-ORG` placeholder URLs
+- No GitHub Actions workflow for automated publishing
+- No Umbraco Marketplace metadata
+
+## Decisions
+
+### 1. Repository URLs
+
+Fixed both `RepositoryUrl` and `PackageProjectUrl` to `https://github.com/jonnymuir/Umbraco.uMockingSuite`. Added `RepositoryType = git`.
+
+### 2. NuGet Tags for Marketplace Discoverability
+
+The Umbraco Marketplace discovers packages by the `umbraco-package` tag on NuGet.org. Tag list updated to:
+
+```
+umbraco-package;umbraco;umbraco17;umbraco-backoffice;ai;notifications;mocking;umbraco-ai
+```
+
+`umbraco-package` is placed first to ensure it is not truncated. `backoffice` replaced with `umbraco-backoffice` (more specific). `hackathon` removed (not a discovery term). `notifications` added (describes functionality).
+
+### 3. umbraco-marketplace.json
+
+Created at repo root. The Umbraco Marketplace reads this file for richer listing info (compatibility versions, bug tracker URL, source URL, etc.) beyond what NuGet metadata provides.
+
+### 4. GitHub Actions Workflow
+
+Trigger: `push` of `v*.*.*` tags. Steps: restore → build → pack → NuGet push (using `NUGET_API_KEY` secret) → GitHub Release. `--skip-duplicate` flag makes the workflow idempotent.
+
+### 5. PackageIcon Placeholder
+
+Added `<PackageIcon>icon.png</PackageIcon>` to the csproj without creating the file. This primes the property for when an icon is designed, without breaking the build.
+
+### 6. Documentation
+
+Created `.github/NUGET_SETUP.md` with instructions for Jonny to:
+1. Generate and store the NuGet API key as a GitHub Actions secret
+2. Trigger a release via `git tag v0.x.x && git push origin v0.x.x`
+
+---
+
+### 2026-04-17: Pin System.Security.Cryptography.Xml to Patched Version
+**By:** Maggie (Security Expert)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+`Umbraco.Cms 17.3.4` transitively pulls `System.Security.Cryptography.Xml` 8.0.0, which carries two high-severity advisories:
+
+| Advisory | Description | CVSS |
+|---|---|---|
+| GHSA-37gx-xxp4-5rgx | DoS via infinite loop in `EncryptedXml` | 7.5 High |
+| GHSA-w3x6-4m5h-cxqf | High severity vulnerability | High |
+
+Both were reported as `NU1903` build warnings. Since the Umbraco.Cms version is fixed at 17.3.4 and cannot be changed without a larger upgrade, the fix must be a transitive override in the package project itself.
+
+## Decision
+
+Add an explicit `<PackageReference>` for `System.Security.Cryptography.Xml` at version `10.0.6` in `uMockingSuite/uMockingSuite.csproj`. This forces NuGet to resolve the dependency floor upward to the patched release.
+
+**Package pinned:**
+- `System.Security.Cryptography.Xml` → `10.0.6` (patched version for .NET 10)
+
+**No `<PrivateAssets>all</PrivateAssets>`** — this is a security floor pin and must flow to downstream consumers of the NuGet package so they also receive the safe version.
+
+## Rationale
+
+1. Cannot bump `Umbraco.Cms` to resolve the transitive dep — version is pinned at 17.3.4 per project requirements.
+2. Explicit version pin is the standard .NET supply chain security pattern for overriding bad transitive deps.
+3. 10.0.6 is the correct patched version for the net10.0 target framework — advisory confirmed `>=10.0.0, <=10.0.5` is affected.
+4. Latest stable release (10.0.6) chosen rather than minimum patched (8.0.3) to remain on the net10.0 release train and benefit from all subsequent fixes.
+
+## Verification
+
+- `dotnet list package --vulnerable --include-transitive` → "no vulnerable packages"
+- `dotnet build uMockingSuite/uMockingSuite.csproj -c Release` → 0 errors
+- Committed `b733f60`, pushed to main
+
+## Affected Files
+
+- `uMockingSuite/uMockingSuite.csproj` — added explicit `PackageReference` for `System.Security.Cryptography.Xml` 10.0.6
+
+---
+
+### 2026-04-17: Documentation and NuGet Packaging Strategy
+**By:** John (DevRel & Release Engineer)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+uMockingSuite needed professional documentation, GitHub repository hygiene, and proper NuGet packaging before it could be released to the community. The package was built at the Manchester Umbraco AI Hackathon as a demonstration/study vehicle, and that origin story needed to be front-and-center in all public-facing materials.
+
+## Decision
+
+Implemented a complete DevRel and packaging stack:
+
+### Documentation
+- **README.md** — Comprehensive package documentation with:
+  - Hackathon origin story and "study vehicle" positioning
+  - Clear installation and configuration steps
+  - Technical "How It Works" section explaining extension points
+  - Development/contributing guide
+  - "disengage" future vision teaser
+- **LICENSE** — MIT license (standard for open-source Umbraco packages)
+- **CHANGELOG.md** — Keep a Changelog format, v0.1.0 initial release documented
+- **CONTRIBUTING.md** — Welcoming contribution guide with ground rules and local setup
+
+### GitHub Repository Hygiene
+- Issue templates for bug reports and feature requests
+- Structured to encourage community contributions
+- Acknowledges hackathon/learning context in templates
+
+### NuGet Package Metadata
+Enhanced `uMockingSuite.csproj` with:
+- Detailed description mentioning hackathon origin and Umbraco AI integration
+- Comprehensive tags: `umbraco;umbraco-package;umbraco17;ai;backoffice;mocking;hackathon;umbraco-ai`
+- `PackageReadmeFile`, `PackageLicenseExpression`, `Copyright`, `RepositoryUrl`, `PackageProjectUrl`
+- README.md included in NuGet package root
+
+### App_Plugins Packaging Path (Critical Fix)
+Changed from:
+```xml
+<PackagePath>content\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+```
+To:
+```xml
+<PackagePath>content\App_Plugins\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+```
+
+**Why:** Umbraco packages require backoffice assets at `content/App_Plugins/{PackageName}/` in the NuGet package so they deploy correctly to the host site's `wwwroot/App_Plugins/` on install. The `%(RecursiveDir)` MSBuild property only gives us `uMockingSuite/`, not `App_Plugins/uMockingSuite/`. Explicitly prepending `App_Plugins\` in the PackagePath ensures correct structure.
+
+## Rationale
+
+### Hackathon Story Front-and-Center
+This package's value is as a learning resource and demonstration, not as a production tool. Every piece of documentation emphasizes this to:
+1. Set appropriate expectations (no SLA, welcome to contribute)
+2. Encourage forking and experimentation
+3. Celebrate the Manchester Umbraco AI Hackathon as community-building
+
+### README Tone
+Balanced technical accuracy with personality. The package is called uMockingSuite and generates snarky comments—the documentation can have some warmth and humor while remaining professional.
+
+### "disengage" Teaser
+Including the future vision shows this is a prototype with a roadmap, not abandonware. Invites community to be part of what comes next.
+
+### NuGet Packaging Path
+This was **critical**. Incorrect packaging would result in backoffice assets not deploying on `dotnet add package`, breaking the package. Validated with `unzip -l *.nupkg` to confirm `content/App_Plugins/uMockingSuite/` structure.
+
+## Validation
+
+Verified via:
+1. `dotnet build` (Debug and Release) — succeeded
+2. `dotnet pack` — succeeded, package size ~20KB
+3. `unzip -l uMockingSuite.0.1.0.nupkg` — confirmed structure:
+   - `lib/net10.0/uMockingSuite.dll`
+   - `content/App_Plugins/uMockingSuite/umbraco-package.json`
+   - `content/App_Plugins/uMockingSuite/umockingsuite-settings.js`
+   - `content/App_Plugins/uMockingSuite/umockingsuite-workspace-context.js`
+   - `README.md` at root
+
+## What's Ready
+
+- ✅ Package ready for NuGet publishing (pending final repo URL)
+- ✅ GitHub repo ready for community contributions
+- ✅ Documentation explains what it is, how it works, and how to extend it
+- ✅ CHANGELOG ready for versioning workflow
+- ✅ Issue templates guide users to provide useful bug reports and feature requests
+
+## Next Steps
+
+1. Finalize GitHub repository URL (currently placeholder `YOUR-ORG`)
+2. Update `RepositoryUrl` and `PackageProjectUrl` in `.csproj`
+3. Publish v0.1.0 to NuGet
+4. Announce on Umbraco community channels with hackathon story
+
+## Files Created/Modified
+
+**Created:**
+- `uMockingSuite/README.md` (replaced existing stub)
+- `uMockingSuite/LICENSE`
+- `CHANGELOG.md`
+- `CONTRIBUTING.md`
+- `.github/ISSUE_TEMPLATE/bug_report.md`
+- `.github/ISSUE_TEMPLATE/feature_request.md`
+
+**Modified:**
+- `uMockingSuite/uMockingSuite.csproj` — Enhanced NuGet metadata, fixed App_Plugins packaging path, added README to pack
+
+---
+
+### 2026-04-17: GitHub Repository Publication
+**By:** John (DevRel & Release Engineer)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+## Context
+
+uMockingSuite project was ready for public release with documentation, NuGet metadata, GitHub issue templates, and CONTRIBUTING guide. The project needed to be published to a GitHub repository to enable community collaboration and NuGet package distribution.
+
+## Decision
+
+Published the uMockingSuite project to a new public GitHub repository under the project owner's account.
+
+### Repository Details
+- **URL:** https://github.com/jonnymuir/Umbraco.uMockingSuite
+- **Visibility:** Public
+- **Branch:** main
+- **Description:** "A Umbraco 17 backoffice package that dishes out mocking, snarky advice when content is created"
+
+## Implementation
+
+### Step 1: .gitignore Enhancement
+- **Previous state:** Minimal .gitignore with Squad runtime and App_Plugins exclusions only
+- **Issue:** bin/ and obj/ directories from .NET builds were being tracked, bloating the repository
+- **Solution:** Added comprehensive .NET gitignore patterns:
+  - Build artifacts: `bin/`, `obj/`, `*.dll`, `*.exe`, `*.pdb`
+  - IDE/Editor: `.vs/`, `.vscode/`, `*.user`, `*.suo`, `.idea/`
+  - NuGet: `.nuget/`, `*.nupkg`, `*.snupkg`, `packages/`
+  - Coverage/Tests: `*.coverage`, `*.coveragexml`, `TestResults/`, `*.trx`
+  - OS: `.DS_Store`, `Thumbs.db`
+
+### Step 2: Repository Cleanup & Staging
+- Executed `git rm -r --cached .` to clear tracking of all files
+- Executed `git add .` with updated .gitignore rules to re-stage project files
+- Result: 271 files changed; build artifacts properly excluded (32,265 lines deleted)
+- Verified `.github/`, `CHANGELOG.md`, `CONTRIBUTING.md` staged correctly
+- Removed from tracking: IDE launch configs (`.vscode/`), tracked build artifacts
+
+### Step 3: Initial Commit
+- Committed as: "chore: clean up gitignore and commit all project work"
+- Included Co-authored-by trailer for Copilot
+- Message documents both .gitignore scope and content included
+
+### Step 4: GitHub Repository Creation & Push
+- Used `gh repo create` CLI command with:
+  - Public visibility flag (`--public`)
+  - Source directory (`.`)
+  - Remote name (`origin`)
+  - Immediate push (`--push`)
+- Branch: main
+- Remote: `https://github.com/jonnymuir/Umbraco.uMockingSuite.git`
+
+## Rationale
+
+### .gitignore Comprehensiveness
+- Prevents future developers from accidentally committing large build artifacts
+- Follows industry-standard .NET exclusion patterns
+- Reduces repository size and clone times
+- Makes git operations responsive
+
+### Public Repository
+- Aligns with Umbraco community standards (open-source packages)
+- Enables external collaboration and contributions
+- Supports NuGet publishing pipeline (GitHub URLs in package metadata)
+- Provides source transparency for AI/ML educational purposes (study vehicle)
+
+### Immediate Push
+- Establishes GitHub as source-of-truth immediately
+- No local-only state—all future work references the public repo
+- Enables team members to clone and contribute immediately
+
+## Verification
+
+✅ .gitignore properly updated with .NET patterns  
+✅ 271 files committed (source code, docs, Squad config)  
+✅ 32,265 deletions (build artifacts removed from tracking)  
+✅ Repository created at GitHub  
+✅ Initial commit pushed to origin/main  
+✅ Remote configured: `origin https://github.com/jonnymuir/Umbraco.uMockingSuite.git`
+
+## Files Committed (Summary)
+
+**New/Modified Files:**
+- `.gitignore` — expanded with .NET patterns
+- `.github/ISSUE_TEMPLATE/bug_report.md` — new
+- `.github/ISSUE_TEMPLATE/feature_request.md` — new
+- `CHANGELOG.md` — new
+- `CONTRIBUTING.md` — new
+- `.squad/agents/john/charter.md` — new
+- `.squad/agents/john/history.md` — new
+- `uMockingSuite/` — all source files (C#, manifests, JS)
+- `uMockingSuite.Tests/` — test suite (source only, no build artifacts)
+- `Umbraco.AI.Demo/` — demo site (source only)
+- `.squad/` — team config and decisions
+
+**Deleted from Tracking:**
+- All `bin/` and `obj/` directories
+- `.vscode/launch.json`, `.vscode/tasks.json`
+- All transitive dependency DLLs
+- IDE-specific files (`*.user`, `*.suo`)
+
+## Next Steps
+
+1. **NuGet Publishing:** When ready, create GitHub Actions workflow to publish `dotnet pack` output to NuGet.org
+2. **Repository URL Updates:** Update `uMockingSuite.csproj` placeholder URLs (currently `https://github.com/YOUR-ORG/...`) to final: `https://github.com/jonnymuir/Umbraco.uMockingSuite`
+3. **Community Onboarding:** Monitor GitHub Issues and PRs; respond to community questions and contributions
+4. **Release Workflow:** Use semantic versioning and CHANGELOG-driven release tags for future versions
+
+---
+
+**Decision Complete:** Project is now publicly available at https://github.com/jonnymuir/Umbraco.uMockingSuite with clean git history, proper .NET build artifact exclusions, and comprehensive documentation.
+

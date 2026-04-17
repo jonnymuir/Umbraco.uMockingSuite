@@ -18,6 +18,7 @@
 | Tony | Backend Dev | `.squad/agents/tony/charter.md` | 🟢 Active |
 | Gordon | Tester/QA | `.squad/agents/gordon/charter.md` | 🟢 Active |
 | John | DevRel & Release Engineer | `.squad/agents/john/charter.md` | 🟢 Active |
+| Maggie | Security Expert | `.squad/agents/maggie/charter.md` | 🟢 Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 🟢 Active |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 
