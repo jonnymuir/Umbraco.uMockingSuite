@@ -36,3 +36,9 @@
 - Theresa's settings UI (`umockingsuite-settings.js`) consumes these endpoints with authenticated fetch using `UMB_AUTH_CONTEXT`
 
 📌 Team update (2026-04-17T00:33:18Z): Settings feature complete — Backend API (profiles, settings endpoints), Frontend UI (dashboard dropdown), Save detection enhancements (requestSubmit wrapping). MockingService now uses user-selected profile instead of hardcoded "chat". Decisions merged, inbox cleared. — Theresa, Tony
+
+📌 **CI Pipeline (2026-04-17)**: Created `.github/workflows/ci.yml` for automated build and test on push to `main` and all PRs. Key decisions:
+- Explicit `Umbraco.AI.Demo.slnx` reference on all dotnet commands (non-standard solution filename, avoids ambiguity on runner)
+- .NET 10.0.x matches project `net10.0` target framework
+- Release configuration throughout for consistency
+- xUnit runs natively via `dotnet test` with TRX logger; results uploaded as artifact with `if: always()` for post-failure diagnosis
