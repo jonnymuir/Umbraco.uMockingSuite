@@ -10,11 +10,12 @@ namespace uMockingSuite.Tests.Services;
 public class MockingServiceTests
 {
     private readonly Mock<ILogger<MockingService>> _loggerMock = new();
+    private readonly Mock<IUMockingSuiteSettingsService> _settingsServiceMock = new();
     private readonly MockingService _sut;
 
     public MockingServiceTests()
     {
-        _sut = new MockingService(_loggerMock.Object);
+        _sut = new MockingService(_loggerMock.Object, _settingsServiceMock.Object);
     }
 
     [Fact]
