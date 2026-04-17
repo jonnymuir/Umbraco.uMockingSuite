@@ -205,4 +205,4 @@ The beauty of this setup is that each agent maintains context, hands off work wi
 
 MIT © 2026 Jonny Muir
 
-Built with ☕ at the Manchester Umbraco AI Hackathon
+Built with love and snark at the Manchester Umbraco AI Hackathon
