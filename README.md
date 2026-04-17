@@ -138,6 +138,8 @@ uMockingSuite was born at the **Manchester Umbraco AI Hackathon** to show just h
 
 The hackathon spirit lives on in this codebase. If you're learning Umbraco 17 extension development or exploring AI integration patterns, fork this repo and make it your own. The community wins when we share knowledge openly.
 
+**Meta note:** This is an AI package about AI, and it was built entirely by an AI team—there's a delightful absurdity to that. Learn more in the [Built with Squad](#built-with-squad) section below.
+
 ## What's Next — disengage
 
 uMockingSuite is the prototype. **disengage** is the evolution.
@@ -153,20 +155,22 @@ If you want to be part of disengage's development, star this repo and watch for 
 
 ## Built with Squad
 
-uMockingSuite was built with [Squad](https://github.com/bradygaster/squad) — an AI team orchestration system for GitHub Copilot. The AI team that built this package consists of:
+Yes, really. This package—which mocks your content with AI—was built entirely by an AI team.
+
+uMockingSuite was orchestrated with [Squad](https://github.com/bradygaster/squad), an AI team system for GitHub Copilot. Each agent has a persistent memory, a charter, and a decision log—which, ironically, is more structured governance than most actual software teams manage. Squad cast this project's team from UK Prime Ministers:
 
 | Name | Role |
 |------|------|
 | Boris | Lead & Architect |
-| Rishi | Umbraco v17 Specialist |
-| Theresa | UI/Frontend Expert |
+| Rishi | Umbraco Specialist |
+| Theresa | Frontend Expert |
 | Tony | Backend Dev |
 | Gordon | Tester/QA |
 | John | DevRel & Release Engineer |
 
-If you've noticed the team has a distinctly Westminster flavour — well spotted. Squad casts agent teams from fictional universes, and for this project it landed on UK Prime Ministers (the real ones are considerably less useful at shipping software).
+The Westminster roster is part of Squad's personality—it assigns fictional universes to agent teams. That said, Boris, Rishi, Theresa, Tony, Gordon, and John proved considerably more reliable at shipping features than their namesakes ever were at, well, anything.
 
-Each agent has a charter, persistent memory, and a decision log. You can see the full team setup in [`.squad/`](.squad/).
+The beauty of this setup is that each agent maintains context, hands off work with precision, and actually completes tasks. Revolutionary, really. You can see the full team charters and decision logs in [`.squad/`](.squad/).
 
 ## License
 
