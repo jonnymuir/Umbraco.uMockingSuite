@@ -10,7 +10,7 @@
 
 uMockingSuite was built at the **Manchester Umbraco AI Hackathon** as a demonstration of how easy it is to get started with the Umbraco AI package. When a content editor saves content in the Umbraco 17 backoffice, uMockingSuite intercepts the event, sends the content details to your configured AI provider (Claude, OpenAI, Google, etc.), and displays a short, witty, passive-aggressive toast notification critiquing their work.
 
-This is **not** a production-hardened tool—it's a study vehicle for developers who want to learn how to add AI features to their own Umbraco projects. Every extension point, API endpoint, and integration pattern is intentionally simple and well-documented.
+This is **not** a production-hardened tool—it's a hackathon/learning project and study vehicle for developers who want to learn how to add AI features to their own Umbraco projects. Every extension point, API endpoint, and integration pattern is intentionally simple and well-documented.
 
 Looking ahead, uMockingSuite is the prototype for **disengage**, a more refined package that will bring personality-driven AI commentary to the Umbraco ecosystem. Watch this space.
 
@@ -72,7 +72,7 @@ uMockingSuite demonstrates several key Umbraco 17 extension points:
 3. **Umbraco AI Integration** — Uses `IAIChatService` with the inline builder API (`builder.WithAlias(profileAlias)`) to call any configured AI provider.
 4. **Dashboard UI** — A Lit-based settings dashboard in the Settings section for profile selection.
 
-All client-side code is vanilla JavaScript (no build step required). The package manifest at `App_Plugins/uMockingSuite/umbraco-package.json` registers both the workspace context and the dashboard.
+All client-side code is vanilla JavaScript (no build step required). The package manifest at `uMockingSuite/App_Plugins/uMockingSuite/umbraco-package.json` registers both the workspace context and the dashboard.
 
 ## Development / Contributing
 
@@ -91,7 +91,7 @@ cd Umbraco.AI.Demo
 dotnet run
 ```
 
-The demo site references uMockingSuite via a `ProjectReference`, so changes to the package are reflected immediately. An MSBuild target in `uMockingSuite.csproj` automatically copies `App_Plugins` assets to the host site's output directory on build.
+The demo site references uMockingSuite via a `ProjectReference`, so changes to the package are reflected immediately. An MSBuild target in `uMockingSuite/uMockingSuite.csproj` automatically copies `App_Plugins` assets to the host site's output directory on build.
 
 ### Project Structure
 
@@ -150,6 +150,23 @@ We're planning to expand this concept into a more refined package with:
 - Integration with content workflows and approval processes
 
 If you want to be part of disengage's development, star this repo and watch for updates. Or better yet, contribute to uMockingSuite and help shape what comes next.
+
+## Built with Squad
+
+uMockingSuite was built with [Squad](https://github.com/bradygaster/squad) — an AI team orchestration system for GitHub Copilot. The AI team that built this package consists of:
+
+| Name | Role |
+|------|------|
+| Boris | Lead & Architect |
+| Rishi | Umbraco v17 Specialist |
+| Theresa | UI/Frontend Expert |
+| Tony | Backend Dev |
+| Gordon | Tester/QA |
+| John | DevRel & Release Engineer |
+
+If you've noticed the team has a distinctly Westminster flavour — well spotted. Squad casts agent teams from fictional universes, and for this project it landed on UK Prime Ministers (the real ones are considerably less useful at shipping software).
+
+Each agent has a charter, persistent memory, and a decision log. You can see the full team setup in [`.squad/`](.squad/).
 
 ## License
 
