@@ -8,8 +8,13 @@
     <PackageId>uMockingSuite</PackageId>
     <Version>0.1.0</Version>
     <Authors>Jonny Muir</Authors>
-    <Description>Umbraco 17 backoffice package that gives snarky mocking advice when content is created.</Description>
-    <PackageTags>umbraco;package;mocking;backoffice</PackageTags>
+    <Description>AI-powered snarky toast notifications for Umbraco 17. Built at the Manchester Umbraco AI Hackathon to demonstrate how easy it is to integrate the Umbraco AI package into your workflows. A study vehicle for learning Umbraco 17 extension development and AI integration patterns.</Description>
+    <PackageTags>umbraco;umbraco-package;umbraco17;ai;backoffice;mocking;hackathon;umbraco-ai</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © 2026 Jonny Muir</Copyright>
+    <RepositoryUrl>https://github.com/YOUR-ORG/uMockingSuite</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/YOUR-ORG/uMockingSuite</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +27,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="App_Plugins\**" CopyToOutputDirectory="Always" />
+    <Content Include="App_Plugins\**" CopyToOutputDirectory="Always">
+      <Pack>true</Pack>
+      <PackagePath>content\App_Plugins\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

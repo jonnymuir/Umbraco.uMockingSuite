@@ -133,6 +133,7 @@ class UMockingSuiteSettings extends UmbElementMixin(LitElement) {
             const settings = await settingsResponse.json();
 
             console.log('[uMockingSuite] loaded profiles:', profiles);
+            console.log('[uMockingSuite] profile count:', profiles.length, '| aliases:', profiles.map(p => p.alias));
             console.log('[uMockingSuite] loaded settings:', settings);
 
             this._profiles = profiles;
@@ -202,7 +203,7 @@ class UMockingSuiteSettings extends UmbElementMixin(LitElement) {
     }
 
     _handleProfileChange(event) {
-        this._selectedProfileAlias = event.target.value;
+        this._selectedProfileAlias = event.target.value ?? event.detail?.value;
         console.log('[uMockingSuite] profile selected:', this._selectedProfileAlias);
     }
 
@@ -226,20 +227,16 @@ class UMockingSuiteSettings extends UmbElementMixin(LitElement) {
                         </uui-label>
                         <uui-select
                             id="profile-select"
-                            .value=${this._selectedProfileAlias}
+                            label="AI Profile"
+                            .options=${this._profiles.map(p => ({ name: p.name, value: p.alias, selected: p.alias === this._selectedProfileAlias }))}
                             @change=${this._handleProfileChange}
                             ?disabled=${this._loading}
-                        >
-                            ${this._profiles.map(profile => html`
-                                <uui-select-option value="${profile.alias}">
-                                    ${profile.name}
-                                </uui-select-option>
-                            `)}
-                        </uui-select>
+                        ></uui-select>
                     </div>
 
                     <div>
                         <uui-button
+                            label="Save Settings"
                             look="primary"
                             color="positive"
                             @click=${this._handleSave}

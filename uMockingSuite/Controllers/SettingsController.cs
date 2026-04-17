@@ -74,6 +74,10 @@ public class SettingsController : ManagementApiControllerBase
         try
         {
             var profiles = await _profileService.GetProfilesAsync(AICapability.Chat, CancellationToken.None);
+            var allProfiles = await _profileService.GetAllProfilesAsync(CancellationToken.None);
+            _logger.LogInformation("[uMockingSuite] Chat profiles: {ChatCount}, All profiles: {AllCount}", 
+                profiles.Count(), allProfiles.Count());
+            
             var profileList = profiles.Select(p => new
             {
                 id = p.Id,

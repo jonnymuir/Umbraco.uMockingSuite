@@ -11,6 +11,7 @@ How to decide who handles what.
 | Backoffice UI, Lit components, TypeScript | Theresa | Notification panels, toast messages, extension element manifests |
 | Mocking engine, AI integration, services | Tony | Mocking logic, LLM calls, content analysis, service layer |
 | Tests, QA, edge cases | Gordon | Unit tests, integration tests, coverage, QA sign-off |
+| Documentation, README, NuGet packaging, Umbraco Marketplace, GitHub repo hygiene, releases | John | README, CHANGELOG, .csproj package metadata, NuGet output, GitHub Actions CI/CD |
 | Code review | Boris | Review PRs, check quality, approve or reject work |
 | Testing | Gordon | Write tests, find edge cases, verify fixes |
 | Scope & priorities | Boris | What to build next, trade-offs, decisions |
