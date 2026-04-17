@@ -18,11 +18,23 @@ Every content save gets a unique, context-aware AI critique. Here are two exampl
 
 To use uMockingSuite, you'll need to set up a few things in the Umbraco AI package first:
 
+Configure the provider you want in the Umbraco AI feature
+
 ![Configure AI providers (Claude, OpenAI, Google) in Umbraco AI connections](image.png)
+
+And a profile that uses that provider
 
 ![Create a chat profile in Umbraco AI profiles](image-1.png)
 
+Mess around with settings and guard rails
+
 ![Adjust profile settings like model and temperature](image-2.png)
+
+Then attach it to uMockingSuite simply in settings
+
+![Attach to uMockingSuite](image-5.png)
+
+You are good to go, prepare to me lightly but cruely lambasted as you go about your business in the back office.
 
 ## About
 
