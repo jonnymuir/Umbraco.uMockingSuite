@@ -9,12 +9,16 @@
     <Version>0.1.0</Version>
     <Authors>Jonny Muir</Authors>
     <Description>AI-powered snarky toast notifications for Umbraco 17. Built at the Manchester Umbraco AI Hackathon to demonstrate how easy it is to integrate the Umbraco AI package into your workflows. A study vehicle for learning Umbraco 17 extension development and AI integration patterns.</Description>
-    <PackageTags>umbraco;umbraco-package;umbraco17;ai;backoffice;mocking;hackathon;umbraco-ai</PackageTags>
+    <PackageTags>umbraco-package;umbraco;umbraco17;umbraco-backoffice;ai;notifications;mocking;umbraco-ai</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright © 2026 Jonny Muir</Copyright>
-    <RepositoryUrl>https://github.com/YOUR-ORG/uMockingSuite</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/YOUR-ORG/uMockingSuite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jonnymuir/Umbraco.uMockingSuite</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/jonnymuir/Umbraco.uMockingSuite</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReleaseNotes>See CHANGELOG at https://github.com/jonnymuir/Umbraco.uMockingSuite/blob/main/CHANGELOG.md</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

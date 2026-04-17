@@ -1,0 +1,16 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "packageName": "uMockingSuite",
+  "packageId": "uMockingSuite",
+  "icon": "",
+  "nugetPackageId": "uMockingSuite",
+  "minUmbracoVersion": "17.0.0",
+  "compatibility": [
+    { "minVersion": "17.0.0" }
+  ],
+  "fundingLinks": [],
+  "licenseUrl": "https://github.com/jonnymuir/Umbraco.uMockingSuite/blob/main/uMockingSuite/LICENSE",
+  "sourceCodeUrl": "https://github.com/jonnymuir/Umbraco.uMockingSuite",
+  "bugTrackerUrl": "https://github.com/jonnymuir/Umbraco.uMockingSuite/issues",
+  "readmeUrl": "https://github.com/jonnymuir/Umbraco.uMockingSuite/blob/main/uMockingSuite/README.md"
+}
