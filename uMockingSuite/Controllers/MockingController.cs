@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Web.Common.Authorization;
+using uMockingSuite.Models;
 using uMockingSuite.Services;
 
 namespace uMockingSuite.Controllers;
@@ -26,7 +27,10 @@ public class MockingController : ManagementApiControllerBase
     [HttpGet("mocking-message")]
     public async Task<IActionResult> GetMockingMessage(
         [FromQuery] string contentName,
-        [FromQuery] string contentTypeAlias)
+        [FromQuery] string contentTypeAlias,
+        [FromQuery] bool isNew = false,
+        [FromQuery] int propertyCount = 0,
+        [FromQuery] string? propertySample = null)
     {
         _logger.LogInformation("[uMockingSuite] GetMockingMessage called — contentName={ContentName}, contentTypeAlias={ContentTypeAlias}", contentName, contentTypeAlias);
 
@@ -36,8 +40,9 @@ public class MockingController : ManagementApiControllerBase
             return BadRequest(new { error = "contentName and contentTypeAlias are required" });
         }
 
-        var message = await _mockingService.GetMockingMessageAsync(contentName, contentTypeAlias);
-        _logger.LogInformation("[uMockingSuite] Returning mocking message: {Message}", message);
-        return Ok(new { message });
+        var context = new ContentSaveContext(contentName, contentTypeAlias, isNew, propertyCount, propertySample);
+        var response = await _mockingService.GetMockingMessageAsync(context);
+        _logger.LogInformation("[uMockingSuite] Returning mocking response — headline: {Headline}, message: {Message}", response.Headline, response.Message);
+        return Ok(new { headline = response.Headline, message = response.Message });
     }
 }

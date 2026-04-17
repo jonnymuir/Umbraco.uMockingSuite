@@ -54,12 +54,8 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
         try {
             const name = this.#documentContext?.getName?.() ?? 'this content';
 
-            // Log raw data structures to identify alias location
             const rawData = this.#documentContext?.getData?.();
-            console.log('[uMockingSuite] getData():', JSON.stringify(rawData)?.substring(0, 500));
-
             const persistedData = this.#documentContext?.getPersistedData?.();
-            console.log('[uMockingSuite] getPersistedData():', JSON.stringify(persistedData)?.substring(0, 500));
 
             const contentTypeAlias =
                 rawData?.contentType?.alias
@@ -68,7 +64,19 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
                 ?? persistedData?.contentTypeAlias
                 ?? 'document';
 
-            console.log('[uMockingSuite] fetching mocking message — name:', name, 'type:', contentTypeAlias);
+            // Determine if this is a brand new content item (no persisted ID yet)
+            const isNew = !persistedData?.id && !rawData?.id;
+
+            // Extract property values for richer AI context — text-like values only, truncated
+            const values = Array.isArray(rawData?.values) ? rawData.values : [];
+            const propertyCount = values.length;
+            const propertySample = values
+                .filter(v => typeof v?.value === 'string' && v.value.trim().length > 0)
+                .slice(0, 5)
+                .map(v => `${v.alias}: ${v.value.trim().substring(0, 150)}`)
+                .join('; ');
+
+            console.log('[uMockingSuite] fetching mocking message — name:', name, 'type:', contentTypeAlias, 'isNew:', isNew, 'props:', propertyCount);
 
             const token = await this.#authContext?.getLatestToken?.();
             if (!token) {
@@ -76,7 +84,9 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
                 return;
             }
 
-            const params = new URLSearchParams({ contentName: name, contentTypeAlias });
+            const params = new URLSearchParams({ contentName: name, contentTypeAlias, isNew, propertyCount });
+            if (propertySample) params.set('propertySample', propertySample);
+
             const url = `/umbraco/management/api/v1/umockingsuite/mocking-message?${params}`;
             const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
 
@@ -86,12 +96,12 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
             }
 
             const data = await response.json();
-            console.log('[uMockingSuite] 🎭 message received:', data?.message);
+            console.log('[uMockingSuite] 🎭 response received:', data?.headline, '|', data?.message);
 
             if (data?.message) {
                 this.#notificationContext?.peek('warning', {
                     data: {
-                        headline: '🎭 uMockingSuite says:',
+                        headline: data.headline ?? '🎭 uMockingSuite says:',
                         message: data.message
                     }
                 });
