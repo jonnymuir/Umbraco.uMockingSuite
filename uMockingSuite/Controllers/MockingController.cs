@@ -10,7 +10,7 @@ namespace uMockingSuite.Controllers;
 
 [ApiVersion("1.0")]
 [ApiExplorerSettings(GroupName = "uMockingSuite")]
-[Route("umockingsuite/mocking-message")]
+[Route("umbraco/management/api/v{version:apiVersion}/umockingsuite")]
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class MockingController : ManagementApiControllerBase
 {
@@ -23,7 +23,7 @@ public class MockingController : ManagementApiControllerBase
         _logger = logger;
     }
 
-    [HttpGet]
+    [HttpGet("mocking-message")]
     public async Task<IActionResult> GetMockingMessage(
         [FromQuery] string contentName,
         [FromQuery] string contentTypeAlias)

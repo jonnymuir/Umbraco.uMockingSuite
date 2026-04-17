@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Umbraco.AI.Demo",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/Umbraco.AI.Demo/Umbraco.AI.Demo.csproj",
+      "launchSettingsProfile": "Umbraco.Web.UI",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}

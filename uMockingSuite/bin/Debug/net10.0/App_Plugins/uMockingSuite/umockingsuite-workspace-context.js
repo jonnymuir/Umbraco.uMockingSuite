@@ -1,65 +1,94 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+
+console.log('[uMockingSuite] workspace-context module loaded ✅');
 
 export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
     #notificationContext;
     #documentContext;
-    #wasSubmitting = false;
+    #authContext;
+    #isFetchingMockMessage = false;
 
     constructor(host) {
         super(host);
+        console.log('[uMockingSuite] constructor called');
 
-        // Consume notification context for showing toasts
         this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
             this.#notificationContext = context;
         });
 
-        // Consume document workspace context to observe save events
+        this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
+            this.#authContext = context;
+        });
+
         this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+            console.log('[uMockingSuite] ✅ Got document workspace context');
             this.#documentContext = context;
-            
-            // Observe the isSubmitting state to detect when save completes
-            // When it goes from true -> false, a save operation has finished
-            this.observe(context.isSubmitting, (isSubmitting) => {
-                if (this.#wasSubmitting && !isSubmitting) {
-                    // Save just completed - trigger the mocking message
-                    this.#handleSaveCompleted();
-                }
-                this.#wasSubmitting = isSubmitting;
-            });
+
+            // Hook validateVariantsAndSubmit — confirmed as the save entry point in Umbraco 17.
+            // We intercept the resolveFn callback (2nd argument) to detect a successful save.
+            // IMPORTANT: wrapper must be synchronous (not async) — these are callback-based, not Promise-based.
+            if (typeof context.validateVariantsAndSubmit === 'function') {
+                const orig = context.validateVariantsAndSubmit.bind(context);
+                context.validateVariantsAndSubmit = (variants, resolveFn, rejectFn) => {
+                    const wrappedResolve = (...args) => {
+                        console.log('[uMockingSuite] 🎭 Save succeeded — fetching mocking message...');
+                        this.#handleSaveCompleted(); // async fire-and-forget — do NOT await
+                        return resolveFn?.(...args);
+                    };
+                    return orig(variants, wrappedResolve, rejectFn);
+                };
+                console.log('[uMockingSuite] ✅ validateVariantsAndSubmit hooked');
+            } else {
+                console.warn('[uMockingSuite] ⚠️ validateVariantsAndSubmit not found on context');
+            }
         });
     }
 
     async #handleSaveCompleted() {
+        if (this.#isFetchingMockMessage) return;
+        this.#isFetchingMockMessage = true;
+
         try {
-            // Get content details from the workspace context
-            const unique = this.#documentContext?.getUnique();
-            const name = this.#documentContext?.getName();
-            const contentType = this.#documentContext?.getContentType();
-            
-            if (!name || !contentType) {
-                // Not enough info to fetch mocking message
+            const name = this.#documentContext?.getName?.() ?? 'this content';
+
+            // Log raw data structures to identify alias location
+            const rawData = this.#documentContext?.getData?.();
+            console.log('[uMockingSuite] getData():', JSON.stringify(rawData)?.substring(0, 500));
+
+            const persistedData = this.#documentContext?.getPersistedData?.();
+            console.log('[uMockingSuite] getPersistedData():', JSON.stringify(persistedData)?.substring(0, 500));
+
+            const contentTypeAlias =
+                rawData?.contentType?.alias
+                ?? rawData?.contentTypeAlias
+                ?? persistedData?.contentType?.alias
+                ?? persistedData?.contentTypeAlias
+                ?? 'document';
+
+            console.log('[uMockingSuite] fetching mocking message — name:', name, 'type:', contentTypeAlias);
+
+            const token = await this.#authContext?.getLatestToken?.();
+            if (!token) {
+                console.warn('[uMockingSuite] ⚠️ No auth token — skipping.');
                 return;
             }
 
-            // Call the uMockingSuite Management API
-            const params = new URLSearchParams({
-                contentName: name,
-                contentTypeAlias: contentType.alias || contentType
-            });
-            
-            const response = await fetch(`/umbraco/management/api/v1/umockingsuite/mocking-message?${params}`);
-            
+            const params = new URLSearchParams({ contentName: name, contentTypeAlias });
+            const url = `/umbraco/management/api/v1/umockingsuite/mocking-message?${params}`;
+            const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+
             if (!response.ok) {
-                // Silently fail - don't disrupt the content save workflow
+                console.warn('[uMockingSuite] ⚠️ API returned', response.status);
                 return;
             }
 
             const data = await response.json();
-            
-            if (data && data.message) {
-                // Show the mocking message as a warning toast
+            console.log('[uMockingSuite] 🎭 message received:', data?.message);
+
+            if (data?.message) {
                 this.#notificationContext?.peek('warning', {
                     data: {
                         headline: '🎭 uMockingSuite says:',
@@ -68,8 +97,9 @@ export class UMockingSuiteWorkspaceContext extends UmbControllerBase {
                 });
             }
         } catch (error) {
-            // Silently swallow errors - we don't want to break the save workflow
-            console.debug('[uMockingSuite] Failed to fetch mocking message:', error);
+            console.error('[uMockingSuite] ❌ Error:', error);
+        } finally {
+            this.#isFetchingMockMessage = false;
         }
     }
 }

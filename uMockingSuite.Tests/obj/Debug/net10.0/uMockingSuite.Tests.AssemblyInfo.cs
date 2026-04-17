@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("uMockingSuite.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a35bb3e13c46b9e64f23bfd539e90f673d40462")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e58e3d251afcca5f5f1297f6872598935ba24f1e")]
 [assembly: System.Reflection.AssemblyProductAttribute("uMockingSuite.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("uMockingSuite.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
